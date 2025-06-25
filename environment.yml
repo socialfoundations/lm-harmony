@@ -1,0 +1,23 @@
+name: rank-consistency
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.10.16
+  - pip
+  - pip:
+    - lm-eval==0.4.5   
+    - torch
+    - matplotlib       
+    - tqdm             
+    - pandas           
+    - numpy            
+    - joblib           
+    - tqdm
+    - gitpython        
+    - scikit-learn     
+    - datasets==3.2.0  
+    - tensorboard      
+    - transformers==4.51.3  
+    - trl==0.17.0      
+    - peft==0.15.2     
