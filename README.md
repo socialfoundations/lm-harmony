@@ -4,7 +4,7 @@
 
 LM-Harmony is an automatic evaluation tool for large language models. Unlike popular direct evaluations for LLMs, LM-Harmony uses a train-before-test evaluation paradigm. Each model is fine-tuned on the corresponding training set before evaluation. Our results demonstrate that LM-Harmony provides significantly more consistent model rankings across various tasks, revealing the true general capabilities of each model.
 
-The leaderboard includes 24 benchmarks, covering language understanding, commonsense reasoning, question answering, math, physics, chemistry, biology, and medicine. We report scores for each benchmark and aggregate them using the first principal component score of the entire score matrix, which accounts for 85% of the variance. More details can be found in our paper.
+The leaderboard includes 24 benchmarks, covering language understanding, commonsense reasoning, question answering, math, physics, chemistry, biology, and medicine. We report scores for each benchmark and aggregate them using the first principal component score of the entire score matrix, which accounts for 85% of the variance. More details can be found in our [paper](https://arxiv.org/pdf/2507.05195).
 
 ## Leaderboard
 
