@@ -3,6 +3,7 @@ import os
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
+    logging,
 )
 from peft import LoraConfig, AutoPeftModelForCausalLM
 from trl import SFTTrainer, SFTConfig, DataCollatorForCompletionOnlyLM
@@ -13,6 +14,8 @@ from zarth_utils.nn_utils import set_random_seed, get_all_paths
 from zarth_utils.recorder import Recorder
 from data_utils import get_dataset
 from eval_utils import Evaluator, EvaluationCallback
+
+logging.set_verbosity_error()  # only errors, no warnings
 
 
 def main():
@@ -94,6 +97,7 @@ def main():
             [config.task_name],
             config["random_seed"],
             **config["dataset_param"],
+            use_system_role=False if "gemma" in config["base_model"].lower() else True,
         )
     )
     validator = Evaluator(
@@ -224,22 +228,23 @@ def main():
                 key="best_global_step",
                 value=trainer.state.best_global_step,
             )
-        recorder.add_with_logging(
-            key="best_eval_score",
-            value=trainer.state.best_metric,
-        )
-        all_steps = [
-            k
-            for k in recorder.keys()
-            if k.startswith("epoch_")
-            and k.endswith(config.train_param.metric_for_best_model)
-        ]
-        sgn = 1 if config.train_param.greater_is_better else -1
-        best_step = max(all_steps, key=lambda x: sgn * recorder[x])
-        recorder.add_with_logging(
-            key="best_test_score",
-            value=recorder[best_step.replace("eval", "test")],
-        )
+            recorder.add_with_logging(
+                key="best_eval_score",
+                value=trainer.state.best_metric,
+            )
+            all_steps = [
+                k
+                for k in recorder.keys()
+                if k.startswith("epoch_")
+                and k.endswith(config.train_param.metric_for_best_model)
+            ]
+            sgn = 1 if config.train_param.greater_is_better else -1
+            best_step = max(all_steps, key=lambda x: sgn * recorder[x])
+            if config["eval_every_epoch"]:
+                recorder.add_with_logging(
+                    key="best_test_score",
+                    value=recorder[best_step.replace("eval", "test")],
+                )
 
         model = trainer.model
 

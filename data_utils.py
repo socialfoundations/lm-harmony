@@ -140,6 +140,7 @@ def get_dataset(
     max_num_valid=-1,
     max_num_test=-1,
     apply_chat_template=False,
+    use_system_role=True,
 ):
     task_dict, task_manager = get_tasks(tasks=task_names)
     validation_task_dict = deepcopy(task_dict)
@@ -231,13 +232,21 @@ def get_dataset(
                     choices = task.doc_to_choice(x)
                     if type(target) is int:
                         target = choices[target]
-                    x["prompt"] = question
-                    x["completion"] = target
+                    x["messages"] = [
+                        {"role": "system", "content": "You are helpful"},
+                        {"role": "user", "content": question},
+                        {"role": "assistant", "content": target},
+                    ]
                 else:
                     if type(target) is list:
                         target = " ".join(target)
-                    x["prompt"] = question
-                    x["completion"] = target
+                    x["messages"] = [
+                        {"role": "system", "content": "You are helpful"},
+                        {"role": "user", "content": question},
+                        {"role": "assistant", "content": target},
+                    ]
+                if not use_system_role:
+                    x["messages"] = x["messages"][1:]
 
             return x
 
@@ -248,7 +257,7 @@ def get_dataset(
             remove_columns=[
                 c
                 for c in train_dataset.column_names
-                if c not in ["text", "prompt", "completion"]
+                if c not in ["text", "messages"]
             ],
         )
         valid_dataset = valid_dataset.map(
@@ -258,26 +267,14 @@ def get_dataset(
             remove_columns=[
                 c
                 for c in valid_dataset.column_names
-                if c not in ["text", "prompt", "completion"]
+                if c not in ["text", "messages"]
             ],
         )
-        # test_dataset = test_dataset.map(
-        #     formatting_func,
-        #     batched=False,
-        #     load_from_cache_file=False,
-        #     remove_columns=[
-        #         c
-        #         for c in test_dataset.column_names
-        #         if c not in ["text", "prompt", "completion"]
-        #     ],
-        # )
 
         ret_train.append(train_dataset)
         ret_valid.append(valid_dataset)
-        # ret_test.append(test_dataset)
 
     ret_train = concatenate_datasets(ret_train)
     ret_valid = concatenate_datasets(ret_valid)
-    # ret_test = concatenate_datasets(ret_test)
 
     return ret_train, ret_valid, task_dict, validation_task_dict, task_manager
