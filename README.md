@@ -110,3 +110,8 @@ You can specify the benchmark by *--task_name*. We use the following tasks in ou
 - gsm8k
 
 For more supported benchmarks, please check [lm-eval](https://github.com/EleutherAI/lm-evaluation-harness/tree/v0.4.9/lm_eval/tasks). To determine if a benchmark has a training set, check the corresponding *.yml file for the presence of the keyword *training_split*.
+
+## Reproduce the results from our paper
+
+![train-before-test](assets/results.png)
+You can reproduce the figures from our paper with [analyze_results.ipynb](notebooks/analyze_results.ipynb).
